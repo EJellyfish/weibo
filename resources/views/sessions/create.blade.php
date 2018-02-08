@@ -13,15 +13,15 @@
 				{{ csrf_field() }}
 
 				<div class="form-group">
-					<label for="email" class="col-md-3 control-label">邮箱：</label>
-                    <div class="col-md-8">
+					<label for="email" class="col-sm-3 control-label">邮箱：</label>
+                    <div class="col-sm-8">
                         <input type="text" name="email" class="form-control" value="{{ old('email') }}">
                     </div>
 				</div>
 
 				<div class="form-group">
-					<label for="password" class="col-md-3 control-label">密码：</label>
-                    <div class="col-md-8">
+					<label for="password" class="col-sm-3 control-label">密码：</label>
+                    <div class="col-sm-8">
                         <input type="password" name="password" class="form-control" value="{{ old('password') }}">
                     </div>
 				</div>
@@ -33,14 +33,16 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary col-sm-offset-3 col-md-6">登录</button>
+                    <div class="col-sm-offset-3 col-sm-6">
+                        <button type="submit" class="btn btn-primary col-sm-12">登录</button>
+                    </div>
                 </div>
 
 			</form>
 
 			<hr>
 
-            <div class="col-sm-offset-3 col-md-9">
+            <div class="col-sm-offset-3 col-sm-9">
                 <p>还没账号？
                     <a href="{{ route('signup') }}">现在注册！</a>
                 </p>
