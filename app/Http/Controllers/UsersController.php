@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Auth;
 use Illuminate\Http\Request;
+use Mail;
 
 class UsersController extends Controller
 {
     public function __construct()
     {
         $this->middleware('auth', [
-            'except' => ['show', 'create', 'store', 'index'],
+            'except' => ['show', 'create', 'store', 'index', 'confirmEmail'],
         ]);
 
         $this->middleware('guest', [
@@ -46,12 +48,12 @@ class UsersController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        Auth::login($user);
-        session()->flash('success', '欢迎，您将在这里开启一段新的旅程~');
-        return redirect()->route('users.show', [$user]);
+        $this->sendEmailConfirmationTo($user); // 发送注册激活邮箱
+        session()->flash('success', '验证邮件已发送到你的注册邮箱上，请注意查收。');
+        return redirect('/');
     }
 
-    // 用户展示
+    // 用户详情页
     public function show(User $user)
     {
         // $this->authorize('update', $user); // 指定授权策略
@@ -94,4 +96,38 @@ class UsersController extends Controller
         session()->flash('success', '成功删除用户！');
         return back();
     }
+
+    /**
+     * 发送注册激活邮箱
+     * @param  [type] $user 传入邮箱接收对象
+     * @return [type]       [description]
+     */
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view    = 'emails.confirm';
+        $data    = compact('user');
+        $from    = 'xiaogezz@foxmail.com';
+        $name    = '小哥就是闷闷闷油瓶';
+        $to      = $user->email;
+        $subject = "欢迎加入 小哥就是闷闷闷油瓶 的微博应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    // 注册激活操作
+    public function confirmEmail($token)
+    {
+        $user = User::where('activation_token', $token)->firstOrFail();
+
+        $user->activated        = true;
+        $user->activation_token = null;
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '激活成功，欢迎打开新世界的大门');
+        return redirect()->route('users.show', [$user]);
+    }
+
 }
