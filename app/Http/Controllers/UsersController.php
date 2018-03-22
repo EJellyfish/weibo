@@ -56,8 +56,10 @@ class UsersController extends Controller
     // 用户详情页
     public function show(User $user)
     {
-        // $this->authorize('update', $user); // 指定授权策略
-        return view('users.show', compact('user'));
+        $statuses = $user->statuses()
+                         ->orderBy('created_at', 'desc')
+                         ->paginate(30);
+        return view('users.show', compact('user', 'statuses'));
     }
 
     // 用户编辑页面
